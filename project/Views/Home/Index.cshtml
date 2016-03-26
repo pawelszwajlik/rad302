@@ -1,0 +1,84 @@
+﻿<div class="jumbotron">
+    <h1>Game Info</h1>
+</div>
+<div class="row">
+
+    <div class="col-md-4">
+        <h2>Game List</h2>
+        <input type="button" value="Get Games" class="btn btn-primary" onclick="getGames()" />  @*Gets the games list*@
+        <ul id="game-list" class="list-group" />
+    </div>
+
+    <div class="col-md-4">
+        <h2>Game Search</h2>
+        <input type="text" id="gameID" size="5" />
+        <input type="button" value="Find Game" class="btn btn-primary" onclick="findGame()" />  @*Gets the game referenced by index*@
+        <p id="current-game" class="btn btn-info" onclick="getInfo()" />         @*Gets the link*@
+    </div>
+
+    <div class="col-md-4">
+        <h2>Link</h2>
+        <p id="link" class="btn btn-link" onclick="redirect()" />   @*Redirects to the link*@
+    </div>
+
+</div>
+
+<script>
+    var uri = "http://localhost:7370/api/games/";
+
+
+    function clearList()
+    {
+        $('#game-list').empty();
+    }
+
+    function getGames() {
+        clearList();
+
+        $.getJSON(uri).done(function (data) {
+            $.each(data, function (key, item) {
+                $('<li>', { text: item.ID + ":" + item.Name }).appendTo($('#game-list'))
+            });
+        });
+    }
+
+
+    var currentGame;
+
+
+    function findGame() {
+        var id = $('#gameID').val();
+
+        $.getJSON(uri + id)
+        .done(function (data) {
+            currentGame = data;
+
+            $('#current-game').text(data.Name);
+        })
+        .fail(function (jqXHR, textStatus, err) {
+            $('#current-game').text('Error: ' + err);
+        });
+
+    }
+
+
+
+
+    function getInfo() {
+        var name = $('#current-game').text();
+        var wikipediaURL = 'https://en.wikipedia.org/wiki/';
+        var fullURL = wikipediaURL + name;
+
+        $('#link').text(fullURL);
+
+    }
+    
+
+
+
+    function redirect() {
+        var win = window.open($('#link').text());
+        win.focus();
+    }
+
+</script>
